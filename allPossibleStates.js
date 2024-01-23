@@ -12,13 +12,14 @@ function printArray(p, n)
         partition = partition + p[i] + ' ';
         //console.log(p[i] + " ");
     }
+        count = count + 1;
         console.log(partition);
         console.log("");
 }
    
 // Function to generate all unique 
-// partitions of an integer
-function printAllUniqueParts(n)
+// partitions of an integer with k or less parts
+function printAllUniquePartitions(n, parts)
 {
        
     // An array to store a partition
@@ -40,7 +41,9 @@ function printAllUniqueParts(n)
     {
            
         // print current partition
-        printArray(p, k + 1);
+        if (parts > k) {
+            printArray(p, k + 1);
+        }
  
         // Generate next partition
  
@@ -85,9 +88,21 @@ function printAllUniqueParts(n)
         k++;
     }
 }
+
+function getAllPossibleGameStates(n) {
+    for (let i = n; i > 0; i--) {
+        printAllUniquePartitions(i, n-i+1)
+    }
+    printArray([0], 1);
+    console.log("Total Number of States possible " + count);
+}
  
-// Driver code
-console.log("All Unique Partitions of 10" + "\n");
-printAllUniqueParts(10);
+// Driver code (change n to change the circle size)
+function driver (n) {
+    console.log("All Possible Game States for a circle of "+ (n) + "\n");
+    getAllPossibleGameStates(n-1);
+}
+
+driver(2)
  
 // This code is contributed by divyesh072019
