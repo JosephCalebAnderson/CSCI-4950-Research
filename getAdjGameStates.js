@@ -60,7 +60,7 @@ function getAdjGameStates(currentStateArray) {
             }
         }
     }
-    console.log("Total number of states reachable in 1 move: " + count);
+    console.log("Total: " + count);
 }
 
 function arrSort(arr) {
@@ -71,4 +71,5 @@ function arrSort(arr) {
     return arr;
 }
 
+console.log("All reachable states in 1 move:")
 getAdjGameStates(gameArray);
