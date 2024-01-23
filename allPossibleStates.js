@@ -43,49 +43,74 @@ function printAllUniquePartitions(n, parts)
         // print current partition
         if (parts > k) {
             printArray(p, k + 1);
-        }
- 
-        // Generate next partition
- 
-        // Find the rightmost non-one 
-        // value in p[]. Also, update 
-        // the rem_val so that we know
-        // how much value can be 
-        // accommodated
-        let rem_val = 0;
-           
-        while (k >= 0 && p[k] == 1)
-        {
-            rem_val += p[k];
-            k--;
-        }
- 
-        // If k < 0, all the values are 1 so
-        // there are no more partitions
-        if (k < 0) 
-            return;
- 
-        // Decrease the p[k] found above 
-        // and adjust the rem_val
-        p[k]--;
-        rem_val++;
- 
-        // If rem_val is more, then the sorted
-        // order is violated. Divide rem_val in
-        // different values of size p[k] and copy
-        // these values at different positions
-        // after p[k]
-        while (rem_val > p[k])
-        {
-            p[k + 1] = p[k];
-            rem_val = rem_val - p[k];
+            //else {
+                //return;
+            //}
+    
+            // Generate next partition
+    
+            // Find the rightmost non-one 
+            // value in p[]. Also, update 
+            // the rem_val so that we know
+            // how much value can be 
+            // accommodated
+            let rem_val = 0;
+            
+            while (k >= 0 && p[k] == 1)
+            {
+                rem_val += p[k];
+                k--;
+            }
+    
+            // If k < 0, all the values are 1 so
+            // there are no more partitions
+            if (k < 0) 
+                return;
+    
+            // Decrease the p[k] found above 
+            // and adjust the rem_val
+            p[k]--;
+            rem_val++;
+    
+            // If rem_val is more, then the sorted
+            // order is violated. Divide rem_val in
+            // different values of size p[k] and copy
+            // these values at different positions
+            // after p[k]
+            while (rem_val > p[k])
+            {
+                p[k + 1] = p[k];
+                rem_val = rem_val - p[k];
+                k++;
+            }
+    
+            // Copy rem_val to next position and 
+            // increment position
+            p[k + 1] = rem_val;
             k++;
         }
- 
-        // Copy rem_val to next position and 
-        // increment position
-        p[k + 1] = rem_val;
-        k++;
+        else {
+            p[0] = p[0] - 1
+            let max = parts * p[0];
+            // return if the max could never reach n
+            if (max < n) {
+                return;
+            }
+            k = -1;
+            var total = 0;
+            // Set p to the correct values
+            for (let j = 0; j < parts; j ++) {
+                if (total + p[0] >= n) {
+                    p[j] = n - total;
+                    k = k + 1
+                    j = parts
+                } else {
+                    p[j] = p[0];
+                    k = k + 1;
+                    total = total + p[j];
+                }
+            }
+        }
     }
 }
 
@@ -103,6 +128,6 @@ function driver (n) {
     getAllPossibleGameStates(n-1);
 }
 
-driver(2)
+driver(7)
  
 // This code is contributed by divyesh072019
