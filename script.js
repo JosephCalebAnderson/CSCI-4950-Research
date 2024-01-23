@@ -1,7 +1,7 @@
 var gameArray = [7];
 var count = 0;
 // Right now this only counts moves that take 1 stone.
-function getGameStates(currentStateArray) {
+function getAdjGameStates(currentStateArray) {
     // i loop tracks which string is getting split
     console.log("Possible states after taking 1 stone:");
     for (let i = 0; i < currentStateArray.length; i ++) {
@@ -70,4 +70,5 @@ function arrSort(arr) {
     arr.reverse();
     return arr;
 }
-getGameStates(gameArray);
+
+getAdjGameStates(gameArray);
