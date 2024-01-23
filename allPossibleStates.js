@@ -10,7 +10,6 @@ function printArray(p, n)
     for(let i = 0; i < n; i++) {
 
         partition = partition + p[i] + ' ';
-        //console.log(p[i] + " ");
     }
         count = count + 1;
         console.log(partition);
