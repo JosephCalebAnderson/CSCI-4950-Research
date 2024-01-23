@@ -6,14 +6,13 @@
 var count = 0;
 function printArray(p, n)
 {
-    var partition = '';
+    var partition = [];
     for(let i = 0; i < n; i++) {
 
-        partition = partition + p[i] + ' ';
+        partition.push(p[i]);
     }
         count = count + 1;
         console.log(partition);
-        console.log("");
 }
    
 // Function to generate all unique 
@@ -123,7 +122,7 @@ function getAllPossibleGameStates(n) {
  
 // Driver code (change n to change the circle size)
 function driver (n) {
-    console.log("All Possible Game States for a circle of "+ (n) + "\n");
+    console.log("All Possible Game States for a circle of "+ (n));
     getAllPossibleGameStates(n-1);
 }
 
