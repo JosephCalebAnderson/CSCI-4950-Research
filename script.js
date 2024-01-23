@@ -1,5 +1,6 @@
 var gameArray = [5,3,3];
 var count = 0;
+// Right now this only counts moves that take 1 stone.
 function getGameStates(currentStateArray) {
     // i loop tracks which string is getting split
     for (let i = 0; i < currentStateArray.length; i ++) {
@@ -31,7 +32,9 @@ function getGameStates(currentStateArray) {
 }
 
 function arrSort(arr) {
+    // sort the array in ascedning order
     arr.sort((a,b)=>a-b);
+    // reverse the sorted array.
     arr.reverse();
     return arr;
 }
