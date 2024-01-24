@@ -126,6 +126,6 @@ function driver (n) {
     getAllPossibleGameStates(n-1);
 }
 
-driver(7)
+driver(20)
  
 // This code is contributed by divyesh072019

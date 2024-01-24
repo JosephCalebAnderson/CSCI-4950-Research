@@ -1,4 +1,4 @@
-var gameArray = [7];
+var gameArray = [2,2];
 var count = 0;
 // Right now this only counts moves that take 1 stone.
 function getAdjGameStates(currentStateArray) {
@@ -20,6 +20,9 @@ function getAdjGameStates(currentStateArray) {
                 }
                 // perform the split on the selected value
                 newArray[i] = currentStateArray[i] - j;
+                if (newArray[i] == 0) {
+                    newArray.splice(i,1);
+                }
                 // push the new stack if it is a positive value
                 if (newStack != 0) {
                     newArray.push(newStack);
@@ -49,6 +52,9 @@ function getAdjGameStates(currentStateArray) {
                 }
                 // perform the split on the selected value
                 newArray[l] = currentStateArray[l] - m - 1;
+                if (newArray[l] == 0) {
+                    newArray.splice(l,1);
+                }
                 // push the new stack if it is a positive value
                 if (newStack > 0) {
                     newArray.push(newStack);
