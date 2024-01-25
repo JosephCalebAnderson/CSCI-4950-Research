@@ -277,19 +277,35 @@ function setMexValues (adjMat) {
             }
         }
     }
+    // get the MEX value for the circle. Only two values need to be checked so if else is sufficient.
+    let adjMex = [];
+    adjMex.push(adjMat[1][0]);
+    adjMex.push(adjMat[2][0]);
+    if (adjMex.includes(0)) {
+        if (adjMex.includes(1)) {
+            adjMat[0][1] = 2;
+        } else {
+            adjMat[0][1] = 1;
+        }
+    } else {
+        adjMat[0][1] = 0;
+    }
     //console.log(adjMat);
     return adjMat;
 }
 
-function extractStateAndMex(adjMatWithMex) {
+function extractStateAndMex(adjMatWithMex, circleSize) {
     let length = adjMatWithMex.length;
     var stateMat = [];
+    // Push the first line that contatins the MEX value of the circle
+    stateMat.push([[circleSize+'c'],adjMatWithMex[0][1]]);
+    // Push the rest of the states with their MEX Values
     for (let index = 0; index < length - 1; index ++) {
-        let state = adjMatWithMex[index + 1][1]
-        let mexValue = adjMatWithMex[index + 1][0]
+        let state = adjMatWithMex[index + 1][1];
+        let mexValue = adjMatWithMex[index + 1][0];
         stateMat.push([state,mexValue]);
     }
-    return stateMat
+    return stateMat;
 }
 
 function driver (n) {
@@ -300,7 +316,7 @@ function driver (n) {
     console.log("Adjacency Matrix with MEX:");
     console.log(finishedAdjMat);
     console.log('\n\nStates with Mex Values:');
-    let statesAndMex = extractStateAndMex(finishedAdjMat);
+    let statesAndMex = extractStateAndMex(finishedAdjMat, n);
     console.log(statesAndMex);
 }
 
