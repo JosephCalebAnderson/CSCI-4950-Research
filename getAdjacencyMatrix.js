@@ -255,14 +255,27 @@ function getAdjacencyMatrix (stateArray) {
     return adjMatrix;
 }
 
+// Currently throwing error.
 function setMexValues (adjMat) {
-    // Calculate the MEX values here.
+    let rowLength = adjMat.length;
+    let columnLength = adjMat[0].length;
+    console.log(adjMat[rowLength - 3][2])
+    for (let row = rowLength - 3; row > 0; row ++) {
+        let adjMex = [];
+        for (let column = 2; column < columnLength; column ++) {
+            if (adjMat[row][column] == 1) {
+                adjMex.push(adjMat[row][0]);
+            }
+        }
+    }
+    console.log(adjMex);
 }
 
 function driver (n) {
     console.log("All Possible Game States for a circle of "+ (n));
     let allPossibleStates = getAllPossibleGameStates(n-1);
     let adjacencyMatrix = getAdjacencyMatrix(allPossibleStates);
+    setMexValues(adjacencyMatrix);
 }
 
 // 30 does not crash. Crashes at 40
