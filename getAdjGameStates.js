@@ -1,7 +1,9 @@
-var gameArray = [2,2];
+var gameArray = [5,4,3,2];
+
 var count = 0;
 // Right now this only counts moves that take 1 stone.
 function getAdjGameStates(currentStateArray) {
+    var gameStatesArray = [];
     // i loop tracks which string is getting split
     console.log("Possible states after taking 1 stone:");
     for (let i = 0; i < currentStateArray.length; i ++) {
@@ -30,6 +32,7 @@ function getAdjGameStates(currentStateArray) {
                 // sort the new array in descending order and print it
                 newArray = arrSort(newArray);
                 console.log(newArray);
+                gameStatesArray.push(newArray);
                 count = count + 1;
             }
         }
@@ -67,6 +70,8 @@ function getAdjGameStates(currentStateArray) {
         }
     }
     console.log("Total: " + count);
+    console.log("");
+    return gameStatesArray;
 }
 
 function arrSort(arr) {
@@ -78,4 +83,5 @@ function arrSort(arr) {
 }
 
 console.log("All reachable states in 1 move:")
-getAdjGameStates(gameArray);
+let tempArray = getAdjGameStates(gameArray);
+//console.log(tempArray);

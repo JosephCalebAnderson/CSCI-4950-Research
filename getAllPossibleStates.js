@@ -3,7 +3,8 @@
  
 // Function to print an array p[] 
 // of size n
-var count = 0;
+var allStatesArray = [];
+//var count = 0;
 function printArray(p, n)
 {
     var partition = [];
@@ -11,8 +12,8 @@ function printArray(p, n)
 
         partition.push(p[i]);
     }
-        count = count + 1;
-        console.log(partition);
+        allStatesArray.push(partition);
+        //console.log(partition);
 }
    
 // Function to generate all unique 
@@ -117,15 +118,139 @@ function getAllPossibleGameStates(n) {
         printAllUniquePartitions(i, n-i+1)
     }
     printArray([0], 1);
-    console.log("Total Number of States possible " + count);
+    console.log("Total Number of States possible " + allStatesArray.length);
+    return allStatesArray;
 }
  
 // Driver code (change n to change the circle size)
 function driver (n) {
     console.log("All Possible Game States for a circle of "+ (n));
-    getAllPossibleGameStates(n-1);
+    let allStatesArray = getAllPossibleGameStates(n-1);
+    getAdjacencyMatrix(allStatesArray);
 }
 
-driver(20)
+var counter = 0;
+// Right now this only counts moves that take 1 stone.
+function getAdjGameStates(currentStateArray) {
+    var gameStatesArray = [];
+    // i loop tracks which string is getting split
+    //console.log("Possible states after taking 1 stone:");
+    for (let i = 0; i < currentStateArray.length; i ++) {
+        if (currentStateArray[i] != currentStateArray[i+1]) {
+            // j value tracks how much to split the given value
+            for (let j = 1; j <= (currentStateArray[i] + 1)/2; j ++) {
+                // size of the new stack that will be formed after the split
+                let newStack = j-1;
+                // This array will hold the new partition
+                let newArray = []
+                // push all of the positive values into the new array
+                for (let k = 0; k < currentStateArray.length; k ++) {
+                    if (currentStateArray[k] != 0) {
+                        newArray.push(currentStateArray[k]);
+                    }
+                }
+                // perform the split on the selected value
+                newArray[i] = currentStateArray[i] - j;
+                if (newArray[i] == 0 && newArray.length > 1) {
+                    newArray.splice(i,1);
+                }
+                // push the new stack if it is a positive value
+                if (newStack != 0) {
+                    newArray.push(newStack);
+                }
+                // sort the new array in descending order and print it
+                newArray = arrSort(newArray);
+                //console.log(newArray);
+                gameStatesArray.push(newArray);
+                counter = counter + 1;
+            }
+        }
+    }
+    //console.log("Possible states after taking 2 stones:");
+    //This is meant to count moves that take 2 stones.
+    for (let l = 0; l < currentStateArray.length; l ++) {
+        if (currentStateArray[l] != currentStateArray[l+1]) {
+            // j value tracks how much to split the given value
+            for (let m = 1; m <= (currentStateArray[l])/2; m ++) {
+                // size of the new stack that will be formed after the split
+                let newStack = m-1;
+                // This array will hold the new partition
+                let newArray = []
+                // push all of the positive values into the new array
+                for (let n = 0; n < currentStateArray.length; n ++) {
+                    if (currentStateArray[n] != 0) {
+                        newArray.push(currentStateArray[n]);
+                    }
+                }
+                // perform the split on the selected value
+                newArray[l] = currentStateArray[l] - m - 1;
+                if (newArray[l] == 0 && newArray.length > 1) {
+                    newArray.splice(l,1);
+                }
+                // push the new stack if it is a positive value
+                if (newStack > 0) {
+                    newArray.push(newStack);
+                }
+                // sort the new array in descending order and print it
+                newArray = arrSort(newArray);
+                gameStatesArray.push(newArray);
+                //console.log(newArray);
+                counter = counter + 1;
+            }
+        }
+    }
+    //console.log("Total: " + counter);
+    //console.log("");
+    return gameStatesArray;
+}
+
+function arrSort(arr) {
+    // sort the array in ascedning order
+    arr.sort((a,b)=>a-b);
+    // reverse the sorted array.
+    arr.reverse();
+    return arr;
+}
+
+function getAdjacencyMatrix (stateArray) {
+    // Get all possible states
+    let count = stateArray.length
+    // Form the adjacency matrix and index the states along the matrix
+    var adjMatrix = Array(count + 1).fill(0).map(()=>Array(count + 2).fill(0));
+    adjMatrix[0][1] = null
+    adjMatrix[0][0] = 'MEX'
+    for (let a = 0; a < count; a ++) {
+        adjMatrix[0][a + 2] = stateArray[a];
+        adjMatrix[a + 1][0] = -1
+        adjMatrix[a + 1][1] = stateArray[a];
+    }
+    console.log('');
+    //console.log(adjMatrix);
+    for (let row = 1; row < adjMatrix.length; row ++) {
+        let currentGameState = adjMatrix[row][1];
+        let adjacentStates = getAdjGameStates(currentGameState);
+        //console.log(column)
+        for (let column = 2 + row; column < adjMatrix[row].length; column ++) {
+            possibleState = adjMatrix[0][column];
+            var tester1 = JSON.stringify(adjacentStates);
+            var tester2 = JSON.stringify(possibleState);
+            var tester3 = tester1.indexOf(tester2);
+            if(tester3 != -1){
+                adjMatrix[row][column] = 1;
+                //adjacentStates.splice(tester3,1);
+            }
+            
+        }
+    }
+    console.log(adjMatrix);
+}
+
+function driver (n) {
+    console.log("All Possible Game States for a circle of "+ (n));
+    let allPossibleStates = getAllPossibleGameStates(n-1);
+    getAdjacencyMatrix(allPossibleStates);
+}
+
+driver(30);
  
 // This code is contributed by divyesh072019
