@@ -225,6 +225,8 @@ function getAdjacencyMatrix (stateArray) {
         adjMatrix[a + 1][0] = -1
         adjMatrix[a + 1][1] = stateArray[a];
     }
+    // Since this is a winning state set its MEX value to 0.
+    adjMatrix[count - 1][0] = 0;
     //console.log('');
     // the rows will identify the state we are starting from
     for (let row = 1; row < adjMatrix.length; row ++) {
@@ -250,12 +252,17 @@ function getAdjacencyMatrix (stateArray) {
         }
     }
     console.log(adjMatrix);
+    return adjMatrix;
+}
+
+function setMexValues (adjMat) {
+    // Calculate the MEX values here.
 }
 
 function driver (n) {
     console.log("All Possible Game States for a circle of "+ (n));
     let allPossibleStates = getAllPossibleGameStates(n-1);
-    getAdjacencyMatrix(allPossibleStates);
+    let adjacencyMatrix = getAdjacencyMatrix(allPossibleStates);
 }
 
 // 30 does not crash. Crashes at 40
