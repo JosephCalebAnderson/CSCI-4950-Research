@@ -215,29 +215,36 @@ function arrSort(arr) {
 function getAdjacencyMatrix (stateArray) {
     // Get all possible states
     let count = stateArray.length
-    // Form the adjacency matrix and index the states along the matrix
+    // Form the adjacency matrix identifiers
     var adjMatrix = Array(count + 1).fill(0).map(()=>Array(count + 2).fill(0));
     adjMatrix[0][1] = null
     adjMatrix[0][0] = 'MEX'
     for (let a = 0; a < count; a ++) {
+        //index the states along the matrix
         adjMatrix[0][a + 2] = stateArray[a];
         adjMatrix[a + 1][0] = -1
         adjMatrix[a + 1][1] = stateArray[a];
     }
-    console.log('');
-    //console.log(adjMatrix);
+    //console.log('');
+    // the rows will identify the state we are starting from
     for (let row = 1; row < adjMatrix.length; row ++) {
+        // current testing state and the states it can reach in one move
         let currentGameState = adjMatrix[row][1];
         let adjacentStates = getAdjGameStates(currentGameState);
-        //console.log(column)
+        // get the possible reachable state and test if it can be reached by the current state.
         for (let column = 2 + row; column < adjMatrix[row].length; column ++) {
             possibleState = adjMatrix[0][column];
+            // stringify to compare arrays
             var tester1 = JSON.stringify(adjacentStates);
             var tester2 = JSON.stringify(possibleState);
             var tester3 = tester1.indexOf(tester2);
+            // if possible state is in the adjacent states we do the following
             if(tester3 != -1){
+                // set the index to 1 and remove that state from the adjacencyStates list
                 adjMatrix[row][column] = 1;
-                //adjacentStates.splice(tester3,1);
+                tester1 = tester1.replace(tester2+',', '');
+                tester1 = tester1.replace(','+tester2, '');
+                adjacentStates = JSON.parse(tester1);
             }
             
         }
@@ -252,6 +259,6 @@ function driver (n) {
 }
 
 // 30 does not crash. Crashes at 40
-driver(30);
+driver(5);
  
 // This code is contributed by divyesh072019
