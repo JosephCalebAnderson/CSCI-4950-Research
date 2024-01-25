@@ -118,7 +118,7 @@ function getAllPossibleGameStates(n) {
         printAllUniquePartitions(i, n-i+1)
     }
     printArray([0], 1);
-    console.log("Total Number of States possible " + allStatesArray.length);
+    console.log("Total Number of States possible " + allStatesArray.length + "\n");
     return allStatesArray;
 }
  
@@ -281,13 +281,27 @@ function setMexValues (adjMat) {
     return adjMat;
 }
 
+function extractStateAndMex(adjMatWithMex) {
+    let length = adjMatWithMex.length;
+    var stateMat = [];
+    for (let index = 0; index < length - 1; index ++) {
+        let state = adjMatWithMex[index + 1][1]
+        let mexValue = adjMatWithMex[index + 1][0]
+        stateMat.push([state,mexValue]);
+    }
+    return stateMat
+}
+
 function driver (n) {
-    console.log("All Possible Game States for a circle of "+ (n));
+    console.log("All Possible Game States for a circle of "+ (n) + '\n');
     let allPossibleStates = getAllPossibleGameStates(n-1);
     let adjacencyMatrix = getAdjacencyMatrix(allPossibleStates);
     let finishedAdjMat = setMexValues(adjacencyMatrix);
+    console.log("Adjacency Matrix with MEX:");
     console.log(finishedAdjMat);
-    
+    console.log('\n\nStates with Mex Values:');
+    let statesAndMex = extractStateAndMex(finishedAdjMat);
+    console.log(statesAndMex);
 }
 
 // 30 does not crash. Crashes at 40
