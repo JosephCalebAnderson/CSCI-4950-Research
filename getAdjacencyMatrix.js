@@ -251,6 +251,7 @@ function driver (n) {
     getAdjacencyMatrix(allPossibleStates);
 }
 
+// 30 does not crash. Crashes at 40
 driver(30);
  
 // This code is contributed by divyesh072019
