@@ -251,7 +251,7 @@ function getAdjacencyMatrix (stateArray) {
             
         }
     }
-    console.log(adjMatrix);
+    //console.log(adjMatrix);
     return adjMatrix;
 }
 
@@ -259,26 +259,38 @@ function getAdjacencyMatrix (stateArray) {
 function setMexValues (adjMat) {
     let rowLength = adjMat.length;
     let columnLength = adjMat[0].length;
-    console.log(adjMat[rowLength - 3][2])
-    for (let row = rowLength - 3; row > 0; row ++) {
+    for (let row = rowLength - 3; row > 0; row --) {
+        //console.log("row: "+row);
         let adjMex = [];
         for (let column = 2; column < columnLength; column ++) {
+            //console.log("column: " + column);
             if (adjMat[row][column] == 1) {
-                adjMex.push(adjMat[row][0]);
+                adjMex.push(adjMat[column - 1][0]);
+                //console.log(adjMex);
+            }
+        }
+        // get the Mex Value by looking at the other Mex values
+        for (let iterator = 0; iterator < rowLength; iterator ++) {
+            if (!adjMex.includes(iterator)) {
+                adjMat[row][0] = iterator;
+                iterator = rowLength;
             }
         }
     }
-    console.log(adjMex);
+    //console.log(adjMat);
+    return adjMat;
 }
 
 function driver (n) {
     console.log("All Possible Game States for a circle of "+ (n));
     let allPossibleStates = getAllPossibleGameStates(n-1);
     let adjacencyMatrix = getAdjacencyMatrix(allPossibleStates);
-    setMexValues(adjacencyMatrix);
+    let finishedAdjMat = setMexValues(adjacencyMatrix);
+    console.log(finishedAdjMat);
+    
 }
 
 // 30 does not crash. Crashes at 40
-driver(5);
+driver(9);
  
 // This code is contributed by divyesh072019
