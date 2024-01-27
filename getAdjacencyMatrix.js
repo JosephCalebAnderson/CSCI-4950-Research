@@ -318,6 +318,14 @@ function driver (n) {
     console.log('\n\nStates with Mex Values:');
     let statesAndMex = extractStateAndMex(finishedAdjMat, n);
     console.log(statesAndMex);
+    let winningStates = [];
+    for (let state = 0; state < statesAndMex.length; state ++) {
+        if (statesAndMex[state][1] == 0) {
+            winningStates.push(statesAndMex[state]);
+        }
+    }
+    console.log('\n\nWinning States: ')
+    console.log(winningStates);
 }
 
 // 30 does not crash. Crashes at 40
