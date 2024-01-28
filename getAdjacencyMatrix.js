@@ -1,3 +1,5 @@
+const fs = require('fs')
+
 function getPartition(p, n)
 {
     let partition = [];
@@ -282,16 +284,24 @@ function driver (n) {
     let statesAndMex = extractStateAndMex(finishedAdjMat, n);
     console.log(statesAndMex);
     let winningStates = [];
+    let winningStatesString = '';
     for (let state = 0; state < statesAndMex.length; state ++) {
         if (statesAndMex[state][1] == 0) {
             winningStates.push(statesAndMex[state]);
+            winningStatesString = winningStatesString + JSON.stringify(statesAndMex[state]) + '\n';
         }
     }
-    console.log('\n\nWinning States: ')
-    console.log(winningStates);
+    console.log('\n\nWinning States: ');
+    //let winningStatesString = JSON.stringify(winningStates);
+    //console.log(winningStates);
+    fs.writeFile('Output.txt', winningStatesString, (err) => {
+ 
+        // In case of a error throw err.
+        if (err) throw err;
+    })
 }
 
 // 30 does not crash. Crashes at 40
-driver(5);
+driver(30);
  
 // This code is contributed by divyesh072019
