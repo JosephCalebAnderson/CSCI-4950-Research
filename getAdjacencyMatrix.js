@@ -302,6 +302,6 @@ function driver (n) {
 }
 
 // 30 does not crash. Crashes at 40
-driver(30);
+driver(5);
  
 // This code is contributed by divyesh072019
