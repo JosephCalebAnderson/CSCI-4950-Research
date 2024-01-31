@@ -186,11 +186,12 @@ function getAdjacencyMatrix (stateArray) {
     for (let a = 0; a < count; a ++) {
         //index the states along the matrix
         adjMatrix[0][a + 2] = stateArray[a];
-        adjMatrix[a + 1][0] = -1
+        // CHANGE THE FOLLOWING LINE TO 0 FOR TAKE LAST AND 1 TO GIVE LAST.
+        adjMatrix[a + 1][0] = 0
         adjMatrix[a + 1][1] = stateArray[a];
     }
-    // Since this is a winning state set its MEX value to 0.
-    adjMatrix[count - 1][0] = 0;
+    // CHANGE THIS FOLLOWING LINE TO 1 FOR TAKE LAST AND -1 FOR GIVE LAST.
+    adjMatrix[count - 1][0] = 1;
     //console.log('');
     // the rows will identify the state we are starting from
     for (let row = 1; row < adjMatrix.length; row ++) {
@@ -286,7 +287,8 @@ function driver (n) {
     let winningStates = [];
     let winningStatesString = '';
     for (let state = 0; state < statesAndMex.length; state ++) {
-        if (statesAndMex[state][1] == 0) {
+        // Impose conditions on the winning states here.
+        if (statesAndMex[state][1] == 0 && statesAndMex[state][0].length == 2) {
             winningStates.push(statesAndMex[state]);
             winningStatesString = winningStatesString + JSON.stringify(statesAndMex[state]) + '\n';
         }
@@ -302,6 +304,6 @@ function driver (n) {
 }
 
 // 30 does not crash. Crashes at 40
-driver(5);
+driver(35);
  
 // This code is contributed by divyesh072019
