@@ -86,7 +86,7 @@ function getAllStates(n)
     }
 }
  
-// Driver code (change n to change the circle size)
+// Driver code (n is the circle size)
 function driver (n) {
     console.log("All Possible Game States for a circle of "+ (n));
     let allStatesArray = getAllPossibleGameStates(n-1);
@@ -191,10 +191,10 @@ function getAdjacencyMatrix (stateArray) {
     }
     // changes MEX value for 0.
     // CHANGE THE FOLLOWING LINE TO 0 FOR TAKE LAST TO WIN AND -1 TO GIVE LAST TO WIN.
-    adjMatrix[count][0] = 0
+    adjMatrix[count][0] = -1
     // changes MEX value for 1.
     // CHANGE THIS FOLLOWING LINE TO 1 FOR TAKE LAST TO WIN AND 0 FOR GIVE LAST TO WIN.
-    adjMatrix[count - 1][0] = 1;
+    adjMatrix[count - 1][0] = 0;
     //console.log('');
     // the rows will identify the state we are starting from
     for (let row = 1; row < adjMatrix.length; row ++) {
@@ -289,17 +289,56 @@ function driver (n) {
     console.log(statesAndMex);
     let winningStates = [];
     let winningStatesString = '';
+    let losingStatesString = '';
+    let mod = 13;
     for (let state = 0; state < statesAndMex.length; state ++) {
         // Impose conditions on the winning states here.
         if (statesAndMex[state][1] == 0) {
-            winningStates.push(statesAndMex[state]);
-            winningStatesString = winningStatesString + JSON.stringify(statesAndMex[state]) + '\n';
+            let length = statesAndMex[state][0].length
+            let product = 1;
+            let sum = 0;
+            for (let values = 0; values < length; values ++) {
+                if (values % 2 == 0) {
+                    sum = sum + statesAndMex[state][0][values];
+                } else {
+                    sum = sum + statesAndMex[state][0][values];
+                }
+                product = product * statesAndMex[state][0][values];
+            }
+            sum = sum % mod;
+            product = product % mod;
+            winningStatesString = winningStatesString + JSON.stringify(statesAndMex[state]) + ' ' + product + '\n';
+            //winningStates.push(statesAndMex[state]);
+            //winningStatesString = winningStatesString + JSON.stringify(statesAndMex[state]) + '\n';
+        }
+        //Printing Losing states
+        if (statesAndMex[state][1] != 0) {
+            let length = statesAndMex[state][0].length
+            let product = 1;
+            let sum = 0;
+            for (let values = 0; values < length; values ++) {
+                if (values % 2 == 0) {
+                    sum = sum + statesAndMex[state][0][values];
+                } else {
+                    sum = sum + statesAndMex[state][0][values];
+                }
+                product = product * statesAndMex[state][0][values];
+            }
+            sum = sum % mod;
+            product = product % mod;
+            losingStatesString = losingStatesString + JSON.stringify(statesAndMex[state]) + ' ' + product  + '\n';
         }
     }
     console.log('\n\nWinning States: ');
     //let winningStatesString = JSON.stringify(winningStates);
     //console.log(winningStates);
-    fs.writeFile('Output.txt', winningStatesString, (err) => {
+    fs.writeFile('winning.txt', winningStatesString, (err) => {
+ 
+        // In case of a error throw err.
+        if (err) throw err;
+    })
+
+    fs.writeFile('losing.txt', losingStatesString, (err) => {
  
         // In case of a error throw err.
         if (err) throw err;
@@ -307,6 +346,6 @@ function driver (n) {
 }
 
 // 30 does not crash. Crashes at 40
-driver(9);
+driver(30);
  
 // This code is contributed by divyesh072019
