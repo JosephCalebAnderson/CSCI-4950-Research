@@ -172,7 +172,8 @@ function getAdjacencyObjects (gameStatesArr){
         let newState = {
             current: gameStatesArr[state],
             adjacent: adjStates,
-            mex: null
+            mex: null,
+            next: -1
         };
         adjacencyObjsArr.push(newState);
     }
@@ -188,13 +189,18 @@ function getAdjacencyObjects (gameStatesArr){
 function setMexValues (adjObjsArr, circleSize) {
     let length = adjObjsArr.length;
     // Go through each state to find their mex value
+
     for (let currState = length - 3; currState >= 0; currState --) {
+        let count = 0;
         let adjMex = [];
+        let adjNum = adjObjsArr[currState].adjacent;
         // check if each state after the current is an adjacent state
+        // This is working, but it is very slow because of JSON.stringify
+        /*
         for (let testingState = currState + 1; testingState < length; testingState ++) {
-            var tester1 = JSON.stringify(adjObjsArr[currState].adjacent);
-            var tester2 = JSON.stringify(adjObjsArr[testingState].current);
-            var tester3 = tester1.indexOf(tester2);
+            let tester1 = JSON.stringify(adjObjsArr[currState].adjacent);
+            let tester2 = JSON.stringify(adjObjsArr[testingState].current);
+            let tester3 = tester1.indexOf(tester2);
             // if possible state is in the adjacent states we do the following
             if(tester3 != -1){
                 //push the mex value and remove it from the adjacent states.
@@ -207,12 +213,56 @@ function setMexValues (adjObjsArr, circleSize) {
                 }
             }
         }
+        */
+        let maxMex = 0;
+        let largestIndex = -1;
+        // Currently adding more here to attempt to create next state logic.
+        for (let tester = currState + 1; tester < length; tester ++) {
+            // Check to see if a state exists in an array
+            function searchForArray(haystack, needle){
+                var i, j, current;
+                for(i = 0; i < haystack.length; ++i){
+                  if(needle.length === haystack[i].length){
+                    current = haystack[i];
+                    for(j = 0; j < needle.length && needle[j] === current[j]; ++j);
+                    if(j === needle.length)
+                      return i;
+                  }
+                }
+                return -1;
+              }
+              let index = searchForArray(adjObjsArr[currState].adjacent, adjObjsArr[tester].current);
+              // If the testing state is an adjacent state do the following
+            if (index != -1) {
+                // only push to the adjacency matrix if it is a new mex value
+                if (!adjMex.contains(adjObjsArr[tester].mex)) {
+                    adjMex.push(adjObjsArr[tester].mex);
+                    // If this is a new largest max then save its index.
+                    if (adjObjsArr[tester].mex > maxMex) {
+                        largestIndex = tester;
+                    }
+                }
+                // if a mex value of 0 is found update the 'next' value with this index.
+                if (adjObjsArr[tester].mex == 0) {
+                    adjObjsArr[currState].next = tester;
+                }
+                count = count + 1;
+                // if all adjacent states have been found then we can stop searching.
+                if (count == adjNum) {
+                    tester = length;
+                }
+            }
+        }
         // Get the mex value based off adjacent mex values and store it.
         for (let iterator = 0; iterator < length; iterator ++) {
             if (!adjMex.includes(iterator)) {
                 adjObjsArr[currState].mex = iterator;
                 iterator = length;
             }
+        }
+        // Update the next value with the adjacent state with the largest index.
+        if (adjObjsArr[currState].mex != 0) {
+            adjObjsArr[currState].next = largestIndex;
         }
     }
     // get the MEX value for the circle. Only two values need to be checked so if else is sufficient.
@@ -253,17 +303,22 @@ function extractStatesAndMex (adjObjsWithMexArr) {
 //Look at driver
 function driver (size) {
     // For a circle with (size) stones, get the states and their mex values.
+    console.log('calculating...\n');
     let allPossibleStates = getAllStates(size);
+    console.log('All Possible States Found.\n');
     let objArr = getAdjacencyObjects(allPossibleStates);
+    console.log('Adjacency Objects Found.\n')
     let objsWithMex = setMexValues(objArr, size);
-    console.log(objsWithMex);
+    console.log('Mex Values Found.\n')
     let statesAndMex = extractStatesAndMex(objsWithMex);
-    console.log(statesAndMex);
+    console.log('Readability increased.\n');
+    //console.log(statesAndMex);
 
     // This is where operations can be performed on the states with mex array to look at certain values.
     let winningStatesString = '';
     let losingStatesString = '';
-    let mod = 13;
+    let mod = 4;
+    let product = 1;
     for (let state = 0; state < statesAndMex.length; state ++) {
         // Impose conditions on the winning states here.
         if (statesAndMex[state][1] == 0) {
@@ -281,30 +336,15 @@ function driver (size) {
             sum = sum % mod;
             product = product % mod;
             winningStatesString = winningStatesString + JSON.stringify(statesAndMex[state]) + ' ' + product + '\n';
-            //winningStates.push(statesAndMex[state]);
-            //winningStatesString = winningStatesString + JSON.stringify(statesAndMex[state]) + '\n';
         }
+        product = 1;
         // Impose conditions on the losing states here.
         if (statesAndMex[state][1] != 0) {
-            let length = statesAndMex[state][0].length
-            let product = 1;
-            let sum = 0;
-            for (let values = 0; values < length; values ++) {
-                if (values % 2 == 0) {
-                    sum = sum + statesAndMex[state][0][values];
-                } else {
-                    sum = sum + statesAndMex[state][0][values];
-                }
-                product = product * statesAndMex[state][0][values];
-            }
-            sum = sum % mod;
-            product = product % mod;
-            losingStatesString = losingStatesString + JSON.stringify(statesAndMex[state]) + ' ' + product  + '\n';
+            losingStatesString = losingStatesString + JSON.stringify(statesAndMex[state]) + '\n';
         }
     }
-    console.log('\n\nWinning States: ');
-    //let winningStatesString = JSON.stringify(winningStates);
-    //console.log(winningStates);
+
+    //Write the winning and losing states to a file.
     fs.writeFile('winning.txt', winningStatesString, (err) => {
  
         // In case of a error throw err.
@@ -316,6 +356,7 @@ function driver (size) {
         // In case of a error throw err.
         if (err) throw err;
     })
+    console.log('Writing to files.\n')
 }
 
-driver(10);
+driver(40);
