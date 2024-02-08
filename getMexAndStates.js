@@ -186,6 +186,19 @@ function getAdjacencyObjects (gameStatesArr){
     return adjacencyObjsArr;
 }
 
+function searchForArray(haystack, needle){
+    var i, j, current;
+    for(i = 0; i < haystack.length; ++i){
+      if(needle.length === haystack[i].length){
+        current = haystack[i];
+        for(j = 0; j < needle.length && needle[j] === current[j]; ++j);
+        if(j === needle.length)
+          return i;
+      }
+    }
+    return -1;
+}
+
 function setMexValues (adjObjsArr, circleSize) {
     let length = adjObjsArr.length;
     // Go through each state to find their mex value
@@ -219,32 +232,20 @@ function setMexValues (adjObjsArr, circleSize) {
         // Currently adding more here to attempt to create next state logic.
         for (let tester = currState + 1; tester < length; tester ++) {
             // Check to see if a state exists in an array
-            function searchForArray(haystack, needle){
-                var i, j, current;
-                for(i = 0; i < haystack.length; ++i){
-                  if(needle.length === haystack[i].length){
-                    current = haystack[i];
-                    for(j = 0; j < needle.length && needle[j] === current[j]; ++j);
-                    if(j === needle.length)
-                      return i;
-                  }
-                }
-                return -1;
-              }
               let index = searchForArray(adjObjsArr[currState].adjacent, adjObjsArr[tester].current);
               // If the testing state is an adjacent state do the following
             if (index != -1) {
                 // only push to the adjacency matrix if it is a new mex value
-                if (!adjMex.contains(adjObjsArr[tester].mex)) {
+                if (!adjMex.includes(adjObjsArr[tester].mex)) {
                     adjMex.push(adjObjsArr[tester].mex);
                     // If this is a new largest max then save its index.
                     if (adjObjsArr[tester].mex > maxMex) {
-                        largestIndex = tester;
+                        largestIndex = index;
                     }
                 }
                 // if a mex value of 0 is found update the 'next' value with this index.
                 if (adjObjsArr[tester].mex == 0) {
-                    adjObjsArr[currState].next = tester;
+                    adjObjsArr[currState].next = index;
                 }
                 count = count + 1;
                 // if all adjacent states have been found then we can stop searching.
@@ -261,7 +262,7 @@ function setMexValues (adjObjsArr, circleSize) {
             }
         }
         // Update the next value with the adjacent state with the largest index.
-        if (adjObjsArr[currState].mex != 0) {
+        if (adjObjsArr[currState].mex == 0) {
             adjObjsArr[currState].next = largestIndex;
         }
     }
@@ -300,6 +301,29 @@ function extractStatesAndMex (adjObjsWithMexArr) {
     }
     return stateArr;
 }
+
+
+function searchGameObjects(haystack, needle){
+    var i, j, current;
+    for(i = 0; i < haystack.length; ++i){
+      if(needle.length === haystack[i].current.length){
+        current = haystack[i].current;
+        for(j = 0; j < needle.length && needle[j] === current[j]; ++j);
+        if(j === needle.length)
+          return i;
+      }
+    }
+    return -1;
+}
+
+function getPerfectPlayMove(objList ,gameState) {
+    let index = searchGameObjects(objList, gameState);
+    console.log(objList[index]);
+    console.log(index);
+    let adjacentLocation = objList[index].next;
+    return objList[index].adjacent[adjacentLocation];
+}
+
 //Look at driver
 function driver (size) {
     // For a circle with (size) stones, get the states and their mex values.
@@ -356,7 +380,9 @@ function driver (size) {
         // In case of a error throw err.
         if (err) throw err;
     })
-    console.log('Writing to files.\n')
+    console.log('Writing to files.\n');
+    let result = getPerfectPlayMove(objsWithMex,[10,8,3]);
+    console.log(result);
 }
 
-driver(40);
+driver(25);
