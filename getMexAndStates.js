@@ -87,6 +87,42 @@ function getAllStates(n)
 }
 var counter = 0;
 
+function getAdjSingleStoneMoves (currentStateArray) {
+    var gameStatesArray = [];
+    // i loop tracks which string is getting split
+    for (let i = 0; i < currentStateArray.length; i ++) {
+        if (currentStateArray[i] != currentStateArray[i+1]) {
+            // j value tracks how much to split the given value
+            for (let j = 1; j <= (currentStateArray[i] + 1)/2; j ++) {
+                // size of the new stack that will be formed after the split
+                let newStack = j-1;
+                // This array will hold the new partition
+                let newArray = []
+                // push all of the positive values into the new array
+                for (let k = 0; k < currentStateArray.length; k ++) {
+                    if (currentStateArray[k] != 0) {
+                        newArray.push(currentStateArray[k]);
+                    }
+                }
+                // perform the split on the selected value
+                newArray[i] = currentStateArray[i] - j;
+                if (newArray[i] == 0 && newArray.length > 1) {
+                    newArray.splice(i,1);
+                }
+                // push the new stack if it is a positive value
+                if (newStack != 0) {
+                    newArray.push(newStack);
+                }
+                // sort the new array in descending order and print it
+                newArray = arrSort(newArray);
+                gameStatesArray.push(newArray);
+                counter = counter + 1;
+            }
+        }
+    }
+    return gameStatesArray;
+}
+
 function getAdjGameStates(currentStateArray) {
     var gameStatesArray = [];
     // i loop tracks which string is getting split
@@ -261,9 +297,22 @@ function setMexValues (adjObjsArr, circleSize) {
                 iterator = length;
             }
         }
+        // CHANGE TO UPDATE WHAT TO DO WHEN PLACED IN A LOSING POSITION
         // Update the next value with the adjacent state with the largest index.
         if (adjObjsArr[currState].mex == 0) {
-            adjObjsArr[currState].next = largestIndex;
+            // The following would be used to pick a random one stone move.
+            let oneStoneMoves = getAdjSingleStoneMoves(adjObjsArr[currState].current);
+            let amount = oneStoneMoves.length;
+            // return a random number from 0 to amount - 1
+            let move = Math.floor(Math.random() * amount);
+            adjObjsArr[currState].next = move;
+            console.log(adjObjsArr[currState].adjacent[move]);
+            console.log(oneStoneMoves[move]);
+            console.log();
+
+
+            // The following would be used to pick the next move which has the largest mex value.
+            //adjObjsArr[currState].next = largestIndex;
         }
     }
     // get the MEX value for the circle. Only two values need to be checked so if else is sufficient.
@@ -315,8 +364,8 @@ function searchGameObjects(haystack, needle){
     }
     return -1;
 }
-
-function getPerfectPlayMove(objList ,gameState) {
+// use perfectPlay, while losing choose the game state based on criteria when assigning next values.
+function getPerfectPlayMoveBigMex(objList ,gameState) {
     let index = searchGameObjects(objList, gameState);
     console.log(objList[index]);
     console.log(index);
@@ -381,7 +430,7 @@ function driver (size) {
         if (err) throw err;
     })
     console.log('Writing to files.\n');
-    let result = getPerfectPlayMove(objsWithMex,[10,8,3]);
+    let result = getPerfectPlayMoveBigMex(objsWithMex,[10,8,3]);
     console.log(result);
 }
 
