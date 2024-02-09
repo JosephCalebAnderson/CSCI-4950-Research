@@ -1,4 +1,7 @@
-const fs = require('fs')
+const fs = require('fs');
+const prompt = require("prompt-sync")();
+
+
 
 function getPartition(p, n)
 {
@@ -219,6 +222,8 @@ function getAdjacencyObjects (gameStatesArr){
     // changes MEX value for [1].
     // CHANGE THIS FOLLOWING LINE TO 1 FOR TAKE LAST TO WIN AND 0 FOR GIVE LAST TO WIN.
     adjacencyObjsArr[count - 2].mex = 0;
+    //Set the next value of [1] to 0 so it can move to [0].
+    adjacencyObjsArr[count - 2].next = 0;
     return adjacencyObjsArr;
 }
 
@@ -306,11 +311,6 @@ function setMexValues (adjObjsArr, circleSize) {
             // return a random number from 0 to amount - 1
             let move = Math.floor(Math.random() * amount);
             adjObjsArr[currState].next = move;
-            console.log(adjObjsArr[currState].adjacent[move]);
-            console.log(oneStoneMoves[move]);
-            console.log();
-
-
             // The following would be used to pick the next move which has the largest mex value.
             //adjObjsArr[currState].next = largestIndex;
         }
@@ -332,7 +332,11 @@ function setMexValues (adjObjsArr, circleSize) {
     let obj = {
         current: ['' + circleSize + 'c'],
         adjacent: [[circleSize-1],[circleSize-2]],
-        mex: value
+        mex: value,
+        next: 0
+    }
+    if (adjObjsArr[1].mex == 0) {
+        obj.next = 1;
     }
     adjObjsArr.unshift(obj);
     return adjObjsArr;
@@ -365,24 +369,199 @@ function searchGameObjects(haystack, needle){
     return -1;
 }
 // use perfectPlay, while losing choose the game state based on criteria when assigning next values.
-function getPerfectPlayMoveBigMex(objList ,gameState) {
+function getPerfectPlayMove(objList, gameState) {
     let index = searchGameObjects(objList, gameState);
-    console.log(objList[index]);
-    console.log(index);
     let adjacentLocation = objList[index].next;
     return objList[index].adjacent[adjacentLocation];
 }
+// Let's a user play against the computer
+// playerStarts is true if the player starts and false if the computer starts
+function playerVSComputer (circleSize, adjObjs, playerStarts) {
+    let playersTurn = playerStarts;
+    let currentState = [];
+    currentState.push(circleSize + 'c');
+    console.log("Starting a game of Circular Nim on the following state:");
+    console.log(currentState);
+    let gameDone = false;
+    while(!gameDone) {
+        // This is what occurs if it is the players turn.
+        if (playersTurn) {
+            let found = false;
+            console.log("Player 1's turn, the current state is ")
+            console.log(currentState);
+            while (!found) {
+                const userInput = prompt("Please enter your next move in the form x,y,z,... : ");
+                // Error checking below
+                let userState = userInput.split(',').map(Number);
+                let currentStateIndex = searchGameObjects(adjObjs, currentState);
+                let index = searchForArray(adjObjs[currentStateIndex].adjacent, userState);
+                if (index > -1) {
+                    currentState = userState;
+                    found = true;
+                } else {
+                    console.log("\nThat is not a reachable state at this time.\n");
+                }
+            }
+            //Add error checking above
+            // Set the players input as the new current state and change to the computers turn.
+            //currentState = userInput.split(',').map(Number);
+            playersTurn = false;
+        // This is what occurs if it is the computers turn.
+        } else {
+            // Check to see if the player ended the game on their turn.
+            if (currentState.length == 1 && currentState [0] == 0) {
+                gameDone = true;
+            } else {
+                currentState = getPerfectPlayMove(adjObjs, currentState);
+                playersTurn = true;
+                console.log("\nCPU's turn complete.\n");
+                // Check to see if the move the CPU just made ended the game.
+                if (currentState.length == 1 && currentState [0] == 0) {
+                    console.log("The current state is: ");
+                    console.log(currentState);
+                    gameDone = true;
+                }
+            }
+        }
+    }
+    // Let the player know who won.
+    if (playersTurn) {
+        // Should display 'You Win!' for misere condition and 'You Lose.' for normal condition.
+        console.log('You Win!');
+    } else {
+        // Should display 'You Lose.' for misere condition and 'You Win!' for normal condition.
+        console.log('You Lose.');
+    }
+}
 
-//Look at driver
+function playerVSPlayer (circleSize, adjObjs, player1Starts) {
+    let player1Turn = player1Starts;
+    let currentState = [];
+    currentState.push(circleSize + 'c');
+    console.log("Starting a game of Circular Nim on the following state:");
+    console.log(currentState);
+    let gameDone = false;
+    while(!gameDone) {
+        // This is what occurs if it is the players turn.
+        if (player1Turn) {
+            let found = false;
+            console.log("Player 1's turn, the current state is ")
+            console.log(currentState);
+            while (!found) {
+                const userInput = prompt("Please enter your next move in the form x,y,z,... : ");
+                // Error checking below
+                let userState = userInput.split(',').map(Number);
+                let currentStateIndex = searchGameObjects(adjObjs, currentState);
+                let index = searchForArray(adjObjs[currentStateIndex].adjacent, userState);
+                if (index > -1) {
+                    currentState = userState;
+                    found = true;
+                } else {
+                    console.log("\nThat is not a reachable state at this time.\n");
+                }
+            }
+            // Set the players input as the new current state and change to the computers turn.
+            player1Turn = false;
+        // This is what occurs if it is the computers turn.
+        } else {
+            // Check to see if the player ended the game on their turn.
+            if (currentState.length == 1 && currentState [0] == 0) {
+                gameDone = true;
+            } else {
+                let found = false;
+            console.log("Player 2's turn, the current state is ")
+            console.log(currentState);
+            while (!found) {
+                const userInput = prompt("Please enter your next move in the form x,y,z,... : ");
+                // Error checking below
+                let userState = userInput.split(',').map(Number);
+                let currentStateIndex = searchGameObjects(adjObjs, currentState);
+                let index = searchForArray(adjObjs[currentStateIndex].adjacent, userState);
+                if (index > -1) {
+                    currentState = userState;
+                    found = true;
+                } else {
+                    console.log("\nThat is not a reachable state at this time.\n");
+                }
+            }
+            // Set the players input as the new current state and change to the computers turn.
+            player1Turn = true;
+                // Check to see if the move the CPU just made ended the game.
+                if (currentState.length == 1 && currentState [0] == 0) {
+                    console.log("The current state is: ");
+                    console.log(currentState);
+                    gameDone = true;
+                }
+            }
+        }
+    }
+    // Let the player know who won.
+    if (player1Turn) {
+        // Should display 'Player 1 Wins!' for misere condition and 'Player 2 Wins!' for normal condition.
+        console.log('Player 1 Wins!');
+    } else {
+        // Should display 'Player 2 Wins!' for misere condition and 'Player 1 Wins!' for normal condition.
+        console.log('Player 2 Wins!');
+    }
+}
+
+function computerVSComputer (circleSize, adjObjs, computer1Starts) {
+    let computer1Turn = computer1Starts;
+    let currentState = [];
+    currentState.push(circleSize + 'c');
+    console.log("Starting a game of Circular Nim on the following state:");
+    console.log(currentState);
+    let gameDone = false;
+    while(!gameDone) {
+        // This is what occurs if it is the players turn.
+        if (computer1Turn) {
+            currentState = getPerfectPlayMove(adjObjs, currentState);
+            console.log("Computer 1 moves to the following state:");
+            console.log(currentState);
+            console.log();
+            computer1Turn = false;
+        // This is what occurs if it is the computers turn.
+        } else {
+            // Check to see if the player ended the game on their turn.
+            if (currentState.length == 1 && currentState [0] == 0) {
+                gameDone = true;
+            } else {
+                currentState = getPerfectPlayMove(adjObjs, currentState);
+                console.log("Computer 2 moves to the following state:");
+                console.log(currentState);
+                console.log();
+                computer1Turn = true;
+                // Check to see if the move the CPU just made ended the game.
+                if (currentState.length == 1 && currentState [0] == 0) {
+                    gameDone = true;
+                }
+            }
+        }
+    }
+    // Let the player know who won.
+    if (computer1Turn) {
+        // Should display 'Computer 1 Win!' for misere condition and 'Computer 2 Win!' for normal condition.
+        console.log('Computer 1 Win!');
+    } else {
+        // Should display 'Computer 2 Win!' for misere condition and 'Computer 1 Win!' for normal condition.
+        console.log('Computer 2 Win!');
+    }
+}
+
+// Driver program initializes the game and lets you run simulations.
 function driver (size) {
     // For a circle with (size) stones, get the states and their mex values.
     console.log('calculating...\n');
     let allPossibleStates = getAllStates(size);
     console.log('All Possible States Found.\n');
     let objArr = getAdjacencyObjects(allPossibleStates);
-    console.log('Adjacency Objects Found.\n')
+    console.log('Adjacency Objects Found.\n');
     let objsWithMex = setMexValues(objArr, size);
-    console.log('Mex Values Found.\n')
+    console.log('Mex Values Found.\n');
+    console.log(objsWithMex);
+    computerVSComputer(size, objsWithMex, true);
+    // The following only needs to be used for analysis:
+    /*
     let statesAndMex = extractStatesAndMex(objsWithMex);
     console.log('Readability increased.\n');
     //console.log(statesAndMex);
@@ -430,8 +609,7 @@ function driver (size) {
         if (err) throw err;
     })
     console.log('Writing to files.\n');
-    let result = getPerfectPlayMoveBigMex(objsWithMex,[10,8,3]);
-    console.log(result);
+    */
 }
 
-driver(25);
+driver(10);
