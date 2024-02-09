@@ -1,10 +1,7 @@
 const fs = require('fs');
 const prompt = require("prompt-sync")();
 
-
-
-function getPartition(p, n)
-{
+function getPartition(p, n) {
     let partition = [];
     for(let i = 0; i < n; i++) {
         let part = p[i] - 1;
@@ -20,8 +17,7 @@ function getPartition(p, n)
    
 // Function to generate all unique 
 // partitions of an integer
-function getAllStates(n)
-{
+function getAllStates(n) {
        
     // An array to store a partition and all partitions
     let p = new Array(n); 
@@ -39,8 +35,7 @@ function getAllStates(n)
     // partition, then generates next
     // partition. The loop stops when 
     // the current partition has all 1s
-    while (true)
-    {
+    while (true) {
            
         // print current partition
         let newPartition = getPartition(p, k + 1);
@@ -54,8 +49,7 @@ function getAllStates(n)
         // accommodated
         let rem_val = 0;
            
-        while (k >= 0 && p[k] == 1)
-        {
+        while (k >= 0 && p[k] == 1) {
             rem_val += p[k];
             k--;
         }
@@ -75,8 +69,7 @@ function getAllStates(n)
         // different values of size p[k] and copy
         // these values at different positions
         // after p[k]
-        while (rem_val > p[k])
-        {
+        while (rem_val > p[k]) {
             p[k + 1] = p[k];
             rem_val = rem_val - p[k];
             k++;
@@ -90,6 +83,7 @@ function getAllStates(n)
 }
 var counter = 0;
 
+// Get all adjacent states for a given state that take only one stone.
 function getAdjSingleStoneMoves (currentStateArray) {
     var gameStatesArray = [];
     // i loop tracks which string is getting split
@@ -126,6 +120,7 @@ function getAdjSingleStoneMoves (currentStateArray) {
     return gameStatesArray;
 }
 
+// get all adjacent game states for a given state.
 function getAdjGameStates(currentStateArray) {
     var gameStatesArray = [];
     // i loop tracks which string is getting split
@@ -193,6 +188,7 @@ function getAdjGameStates(currentStateArray) {
     return gameStatesArray;
 }
 
+// function to sort an array.
 function arrSort(arr) {
     // sort the array in ascedning order
     arr.sort((a,b)=>a-b);
@@ -201,6 +197,7 @@ function arrSort(arr) {
     return arr;
 }
 
+// create the adjacency objects with a list of game states.
 function getAdjacencyObjects (gameStatesArr){
     let count = gameStatesArr.length
     let adjacencyObjsArr = [];
@@ -227,6 +224,7 @@ function getAdjacencyObjects (gameStatesArr){
     return adjacencyObjsArr;
 }
 
+// search an array of arrays for a given array
 function searchForArray(haystack, needle){
     var i, j, current;
     for(i = 0; i < haystack.length; ++i){
@@ -240,37 +238,18 @@ function searchForArray(haystack, needle){
     return -1;
 }
 
+// set the mex values on adjacency objects.
 function setMexValues (adjObjsArr, circleSize) {
     let length = adjObjsArr.length;
     // Go through each state to find their mex value
 
     for (let currState = length - 3; currState >= 0; currState --) {
+        // needed initial variables.
         let count = 0;
         let adjMex = [];
         let adjNum = adjObjsArr[currState].adjacent;
-        // check if each state after the current is an adjacent state
-        // This is working, but it is very slow because of JSON.stringify
-        /*
-        for (let testingState = currState + 1; testingState < length; testingState ++) {
-            let tester1 = JSON.stringify(adjObjsArr[currState].adjacent);
-            let tester2 = JSON.stringify(adjObjsArr[testingState].current);
-            let tester3 = tester1.indexOf(tester2);
-            // if possible state is in the adjacent states we do the following
-            if(tester3 != -1){
-                //push the mex value and remove it from the adjacent states.
-                adjMex.push(adjObjsArr[testingState].mex);
-                tester1 = tester1.replace(tester2+',', '');
-                tester1 = tester1.replace(','+tester2, '');
-                adjObjsArr[currState].adjacent = JSON.parse(tester1);
-                if (adjObjsArr[currState].adjacent.length == 0) {
-                    testingState = length;
-                }
-            }
-        }
-        */
         let maxMex = 0;
         let largestIndex = -1;
-        // Currently adding more here to attempt to create next state logic.
         for (let tester = currState + 1; tester < length; tester ++) {
             // Check to see if a state exists in an array
               let index = searchForArray(adjObjsArr[currState].adjacent, adjObjsArr[tester].current);
@@ -342,7 +321,7 @@ function setMexValues (adjObjsArr, circleSize) {
     return adjObjsArr;
 }
 
-//Look at extractStateAndMex
+// make a more readable array of states with their mex values.
 function extractStatesAndMex (adjObjsWithMexArr) {
     let length = adjObjsWithMexArr.length;
     var stateArr = [];
@@ -355,7 +334,7 @@ function extractStatesAndMex (adjObjsWithMexArr) {
     return stateArr;
 }
 
-
+// search a list of gameObjects for an array.
 function searchGameObjects(haystack, needle){
     var i, j, current;
     for(i = 0; i < haystack.length; ++i){
@@ -368,12 +347,33 @@ function searchGameObjects(haystack, needle){
     }
     return -1;
 }
+
 // use perfectPlay, while losing choose the game state based on criteria when assigning next values.
 function getPerfectPlayMove(objList, gameState) {
     let index = searchGameObjects(objList, gameState);
     let adjacentLocation = objList[index].next;
     return objList[index].adjacent[adjacentLocation];
 }
+
+function getPlayerMove(objList, gameState) {
+    let found = false;
+    let newState = gameState;
+    while (!found) {
+        const userInput = prompt("Please enter your next move in the form x,y,z,... : ");
+        // Error checking below
+        let userState = userInput.split(',').map(Number);
+        let currentStateIndex = searchGameObjects(objList, gameState);
+        let index = searchForArray(objList[currentStateIndex].adjacent, userState);
+        if (index > -1) {
+            newState = userState;
+            found = true;
+        } else {
+            console.log("\nThat is not a reachable state at this time.\n");
+        }
+    }
+    return newState;
+}
+
 // Let's a user play against the computer
 // playerStarts is true if the player starts and false if the computer starts
 function playerVSComputer (circleSize, adjObjs, playerStarts) {
@@ -386,25 +386,9 @@ function playerVSComputer (circleSize, adjObjs, playerStarts) {
     while(!gameDone) {
         // This is what occurs if it is the players turn.
         if (playersTurn) {
-            let found = false;
             console.log("Player 1's turn, the current state is ")
             console.log(currentState);
-            while (!found) {
-                const userInput = prompt("Please enter your next move in the form x,y,z,... : ");
-                // Error checking below
-                let userState = userInput.split(',').map(Number);
-                let currentStateIndex = searchGameObjects(adjObjs, currentState);
-                let index = searchForArray(adjObjs[currentStateIndex].adjacent, userState);
-                if (index > -1) {
-                    currentState = userState;
-                    found = true;
-                } else {
-                    console.log("\nThat is not a reachable state at this time.\n");
-                }
-            }
-            //Add error checking above
-            // Set the players input as the new current state and change to the computers turn.
-            //currentState = userInput.split(',').map(Number);
+            currentState = getPlayerMove(adjObjs, currentState);
             playersTurn = false;
         // This is what occurs if it is the computers turn.
         } else {
@@ -434,6 +418,7 @@ function playerVSComputer (circleSize, adjObjs, playerStarts) {
     }
 }
 
+// A player can play against a player
 function playerVSPlayer (circleSize, adjObjs, player1Starts) {
     let player1Turn = player1Starts;
     let currentState = [];
@@ -444,23 +429,9 @@ function playerVSPlayer (circleSize, adjObjs, player1Starts) {
     while(!gameDone) {
         // This is what occurs if it is the players turn.
         if (player1Turn) {
-            let found = false;
             console.log("Player 1's turn, the current state is ")
             console.log(currentState);
-            while (!found) {
-                const userInput = prompt("Please enter your next move in the form x,y,z,... : ");
-                // Error checking below
-                let userState = userInput.split(',').map(Number);
-                let currentStateIndex = searchGameObjects(adjObjs, currentState);
-                let index = searchForArray(adjObjs[currentStateIndex].adjacent, userState);
-                if (index > -1) {
-                    currentState = userState;
-                    found = true;
-                } else {
-                    console.log("\nThat is not a reachable state at this time.\n");
-                }
-            }
-            // Set the players input as the new current state and change to the computers turn.
+            currentState = getPlayerMove(adjObjs, currentState);
             player1Turn = false;
         // This is what occurs if it is the computers turn.
         } else {
@@ -468,23 +439,9 @@ function playerVSPlayer (circleSize, adjObjs, player1Starts) {
             if (currentState.length == 1 && currentState [0] == 0) {
                 gameDone = true;
             } else {
-                let found = false;
             console.log("Player 2's turn, the current state is ")
             console.log(currentState);
-            while (!found) {
-                const userInput = prompt("Please enter your next move in the form x,y,z,... : ");
-                // Error checking below
-                let userState = userInput.split(',').map(Number);
-                let currentStateIndex = searchGameObjects(adjObjs, currentState);
-                let index = searchForArray(adjObjs[currentStateIndex].adjacent, userState);
-                if (index > -1) {
-                    currentState = userState;
-                    found = true;
-                } else {
-                    console.log("\nThat is not a reachable state at this time.\n");
-                }
-            }
-            // Set the players input as the new current state and change to the computers turn.
+            currentState = getPlayerMove(adjObjs, currentState);
             player1Turn = true;
                 // Check to see if the move the CPU just made ended the game.
                 if (currentState.length == 1 && currentState [0] == 0) {
@@ -505,6 +462,7 @@ function playerVSPlayer (circleSize, adjObjs, player1Starts) {
     }
 }
 
+// A computer can play against a computer.
 function computerVSComputer (circleSize, adjObjs, computer1Starts) {
     let computer1Turn = computer1Starts;
     let currentState = [];
@@ -558,8 +516,13 @@ function driver (size) {
     console.log('Adjacency Objects Found.\n');
     let objsWithMex = setMexValues(objArr, size);
     console.log('Mex Values Found.\n');
-    console.log(objsWithMex);
+    // This can be changed to change the type of game played. Possibilities include:
+    // playerVSPlayer
+    // playerVSComputer
+    // computerVSComputer
     computerVSComputer(size, objsWithMex, true);
+
+
     // The following only needs to be used for analysis:
     /*
     let statesAndMex = extractStatesAndMex(objsWithMex);
